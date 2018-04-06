@@ -40,7 +40,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/clbanning/mxj"
+	"github.com/shoobyban/mxj"
 	"log"
 	"os"
 	"sort"

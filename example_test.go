@@ -10,7 +10,7 @@ package mxj_test
 import (
 	"bytes"
 	"fmt"
-	"github.com/clbanning/mxj"
+	"github.com/shoobyban/mxj"
 	"io"
 )
 

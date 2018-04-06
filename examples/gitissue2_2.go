@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/clbanning/mxj"
+	"github.com/shoobyban/mxj"
 	"io"
 	"os"
 )

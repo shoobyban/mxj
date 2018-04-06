@@ -28,7 +28,7 @@ import (
 // set the CustomDecoder attribute instead.
 //   import (
 //	     charset "code.google.com/p/go-charset/charset"
-//	     github.com/clbanning/mxj
+//	     github.com/shoobyban/mxj
 //	 )
 //   ...
 //   mxj.XmlCharsetReader = charset.NewReader

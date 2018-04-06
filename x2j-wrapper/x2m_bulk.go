@@ -12,7 +12,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/clbanning/mxj"
+	"github.com/shoobyban/mxj"
 )
 
 // XmlMsgsFromFile()

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/clbanning/mxj"
+	"github.com/shoobyban/mxj"
 )
 
 var data = `<node>

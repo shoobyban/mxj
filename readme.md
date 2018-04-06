@@ -102,7 +102,7 @@ newJson, err := newMap.Json() // ditto</pre>
 
 <h4>Usage</h4>
 
-The package is fairly well [self-documented with examples](http://godoc.org/github.com/clbanning/mxj).
+The package is fairly well [self-documented with examples](http://godoc.org/github.com/shoobyban/mxj).
 
 Also, the subdirectory "examples" contains a wide range of examples, several taken from golang-nuts discussions.
 

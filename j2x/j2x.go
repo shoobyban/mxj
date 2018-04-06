@@ -7,7 +7,7 @@
 package j2x
 
 import (
-	. "github.com/clbanning/mxj"
+	. "github.com/shoobyban/mxj"
 	"io"
 )
 

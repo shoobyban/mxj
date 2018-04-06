@@ -9,7 +9,7 @@ package x2j
 import (
 	"strings"
 
-	"github.com/clbanning/mxj"
+	"github.com/shoobyban/mxj"
 )
 
 // ------------------- sweep up everything for some point in the node tree ---------------------
