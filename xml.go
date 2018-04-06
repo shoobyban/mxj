@@ -398,7 +398,20 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				a = append(a, val)
 				na[key] = a
 			} else {
-				na[key] = val // save it as a singleton
+				switch val.(type) {
+				case string:
+					na[key] = val
+				case int:
+					na[key] = val
+				case float64:
+					na[key] = val
+				case bool:
+					na[key] = val
+				default:
+					var a []interface{}
+					a = append(a, val)
+					na[key] = a
+				}
 			}
 		case xml.EndElement:
 			// len(n) > 0 if this is a simple element w/o xml.Attrs - see xml.CharData case.
