@@ -7,7 +7,7 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	"github.com/clbanning/mxj"
+	"github.com/shoobyban/mxj"
 )
 
 func main() {
