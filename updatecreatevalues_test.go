@@ -1,9 +1,8 @@
 package mxj
 
 import (
-    "fmt"
-    "testing"
-    "github.com/ssomagani/mxj"
+	"fmt"
+	"testing"
 )
 
 var authorDoc = []byte(`
@@ -55,21 +54,21 @@ var authorDoc = []byte(`
 </biblio>`)
 
 func TestUpdateCreate(t *testing.T) {
-	m, merr := mxj.NewMapXml(authorDoc)
+	m, merr := NewMapXml(authorDoc)
 	if merr != nil {
 		t.Fatal("merr:", merr.Error())
 	}
-//	fmt.Println(m.StringIndent())
+	//	fmt.Println(m.StringIndent())
 
 	m.UpdateValuesForPath("comment:Whatever", "biblio.author.books.book", "title:JR")
-    m.UpdateValuesForPath("-country:usa", "biblio.geography")
-    m.UpdateValuesForPath("-temporary:usa", "biblio.author.residence.country")
-    
-    // Don't use wild cards. It'll go to shit
-    //m.UpdateValuesForPath("comment:not bad", "*.*.*.*", "title:The Blood Oranges")
-    
-    fmt.Println("_________________RESULT________________________")
-    fmt.Println(m.StringIndent())
-//    xmlStr, _ := m.XmlIndent("", "    ")
-//    fmt.Println(string(xmlStr))
+	m.UpdateValuesForPath("-country:usa", "biblio.geography")
+	m.UpdateValuesForPath("-temporary:usa", "biblio.author.residence.country")
+
+	// Don't use wild cards. It'll go to shit
+	//m.UpdateValuesForPath("comment:not bad", "*.*.*.*", "title:The Blood Oranges")
+
+	fmt.Println("_________________RESULT________________________")
+	fmt.Println(m.StringIndent())
+	//    xmlStr, _ := m.XmlIndent("", "    ")
+	//    fmt.Println(string(xmlStr))
 }

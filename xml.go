@@ -124,6 +124,11 @@ func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) 
 	return m, b, nil
 }
 
+// XMLReaderToMap parses a XML io.Reader to a map[string]interface{} value
+func XMLReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
+	return xmlReaderToMap(rdr, r)
+}
+
 // xmlReaderToMap() - parse a XML io.Reader to a map[string]interface{} value
 func xmlReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 	// parse the Reader

@@ -118,7 +118,7 @@ func TestUpdateValuesForPath_Author(t *testing.T) {
 	*/
 }
 
-var authorDoc = []byte(`
+var authorDoc2 = []byte(`
 <biblio>
 	<author>
 		<name>William Gaddis</name>
@@ -158,7 +158,7 @@ var authorDoc = []byte(`
 </biblio>`)
 
 func TestAuthorDoc(t *testing.T) {
-	m, merr := NewMapXml(authorDoc)
+	m, merr := NewMapXml(authorDoc2)
 	if merr != nil {
 		t.Fatal("merr:", merr.Error())
 	}
