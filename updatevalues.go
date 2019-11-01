@@ -21,9 +21,11 @@ import (
 //	'path' is dot-notation list of keys to traverse; last key in path can be newVal key
 //	       NOTE: 'path' spec does not currently support indexed array references.
 //	'subkeys' are "key:value[:type]" entries that must match for path node
-//	            The subkey can be wildcarded - "key:*" - to require that it's there with some value.
-//	            If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
-//	            exclusion critera - e.g., "!author:William T. Gaddis".
+//             - For attributes prefix the label with the attribute prefix character, by default a 
+//               hyphen, '-', e.g., "-seq:3". (See SetAttrPrefix function.)
+//             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
+//             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
+//	              exclusion critera - e.g., "!author:William T. Gaddis".
 //
 //	NOTES:
 //		1. Simple elements with attributes need a path terminated as ".#text" to modify the actual value.
@@ -99,7 +101,7 @@ func (mv Map) UpdateValuesForPath(newVal interface{}, path string, subkeys ...st
 
 // navigate the path
 func updateValuesForKeyPath(key string, value interface{}, m interface{}, keys []string, subkeys map[string]interface{}, cnt *int) {
-	// ----- at end node: looking at possible node to get 'key' ----
+    // ----- at end node: looking at possible node to get 'key' ----
 	if len(keys) == 1 {
 		updateValue(key, value, m, keys[0], subkeys, cnt)
 		return
@@ -132,16 +134,29 @@ func updateValuesForKeyPath(key string, value interface{}, m interface{}, keys [
 		case map[string]interface{}:
 			if v, ok := m.(map[string]interface{})[keys[0]]; ok {
 				updateValuesForKeyPath(key, value, v, keys[1:], subkeys, cnt)
-			}
+            } else {
+                m.(map[string]interface{})[keys[0]] = make(map[string]interface{})
+                updateValuesForKeyPath(key, value, m, keys, subkeys, cnt)
+            }
 		case []interface{}: // may be buried in list
+            found := false
 			for _, v := range m.([]interface{}) {
 				switch v.(type) {
 				case map[string]interface{}:
 					if vv, ok := v.(map[string]interface{})[keys[0]]; ok {
 						updateValuesForKeyPath(key, value, vv, keys[1:], subkeys, cnt)
+                        found = true
 					}
 				}
 			}
+            if !found {
+                blankVal := make(map[string]interface{})
+                blankVal[keys[0]] = make(map[string]interface{})
+                m = append(m.([]interface{}), blankVal)
+                updateValuesForKeyPath(key, value, blankVal, keys[1:], subkeys, cnt)
+            }
+            default:
+            fmt.Println("Default NOT HANDLED !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		}
 	}
 }
@@ -159,7 +174,10 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 			return
 		}
 		endVal, _ := m.(map[string]interface{})[keys0]
-
+        if endVal == nil {
+            endVal = make(map[string]interface{})
+        }
+        
 		// if newV key is the end of path, replace the value for path-end
 		// may be []interface{} - means replace just an entry w/ subkeys
 		// otherwise replace the keys0 value if subkeys are there
@@ -170,7 +188,7 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 				if hasSubKeys(m, subkeys) {
 					(m.(map[string]interface{}))[keys0] = value
 					(*cnt)++
-				}
+                }
 			case []interface{}:
 				// without subkeys can't select list member to modify
 				// so key:value spec is it ...
@@ -178,7 +196,7 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 					(m.(map[string]interface{}))[keys0] = value
 					(*cnt)++
 					break
-				}
+                }
 				nv := make([]interface{}, 0)
 				var valmodified bool
 				for _, v := range endVal.([]interface{}) {
@@ -203,7 +221,7 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 			}
 			return
 		}
-
+        
 		// so value is for an element of endVal
 		// if endVal is a map then 'key' must be there w/ subkeys
 		// if endVal is a list then 'key' must be in a list member w/ subkeys
@@ -215,7 +233,11 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 			if _, ok := (endVal.(map[string]interface{}))[key]; ok {
 				(endVal.(map[string]interface{}))[key] = value
 				(*cnt)++
-			}
+            } else {
+                endVal.(map[string]interface{})[key] = value
+	            (m.(map[string]interface{}))[keys0] = endVal
+                (*cnt)++
+            }
 		case []interface{}: // keys0 points to a list, check subkeys
 			for _, v := range endVal.([]interface{}) {
 				// got to be a map so we can replace value for 'key'
@@ -223,34 +245,36 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 				if !vok {
 					continue
 				}
-				if _, ok := vv[key]; !ok {
-					continue
-				}
 				if !hasSubKeys(vv, subkeys) {
 					continue
+				}
+				if _, ok := vv[key]; !ok {
+					vv[key] = value
 				}
 				vv[key] = value
 				(*cnt)++
 			}
+            case string:
+                endVal = make(map[string]interface{})
+                endVal.(map[string]interface{})[key] = value
+                (m.(map[string]interface{}))[keys0] = endVal
 		}
 	case []interface{}: // key may be in a list member
 		// don't need to handle keys0 == "*"; we're looking at everything, anyway.
-		for _, v := range m.([]interface{}) {
-			// only map values - we're looking for 'key'
-			mm, ok := v.(map[string]interface{})
-			if !ok {
+        for _, v := range m.([]interface{}) {
+            mm, ok := v.(map[string]interface{})
+        
+            if !ok {
+                continue
+			 }
+			 if _, ok := mm[keys0]; !ok {
+                mm[keys0] = make(map[string]interface{})
+			 }
+			 if !hasSubKeys(mm, subkeys) {
 				continue
-			}
-			if _, ok := mm[key]; !ok {
-				continue
-			}
-			if !hasSubKeys(mm, subkeys) {
-				continue
-			}
-			mm[key] = value
-			(*cnt)++
-		}
+			 }
+            updateValue(key, value, mm, keys0, subkeys, cnt)
+        }
 	}
-
 	// return
 }
